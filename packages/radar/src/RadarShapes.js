@@ -6,9 +6,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-import React, { memo, useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import PropTypes from 'prop-types'
-import { useSpring, animated } from 'react-spring'
+import { useSpring, animated } from '@react-spring/web'
 import { lineRadial } from 'd3-shape'
 import { useMotionConfig, useTheme, useAnimatedPath, blendModePropType } from '@nivo/core'
 import { useInheritedColor, inheritedColorPropType } from '@nivo/colors'

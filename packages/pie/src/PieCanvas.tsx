@@ -1,12 +1,6 @@
-import React, { createElement, useEffect, useMemo, useRef } from 'react'
-import {
-    // @ts-ignore
-    getRelativeCursor,
-    useDimensions,
-    useTheme,
-    Container,
-} from '@nivo/core'
-// @ts-ignore
+import { createElement, useEffect, useMemo, useRef } from 'react'
+import * as React from 'react'
+import { getRelativeCursor, useDimensions, useTheme, Container } from '@nivo/core'
 import { renderLegendToCanvas } from '@nivo/legends'
 import { useInheritedColor, InheritedColorConfig } from '@nivo/colors'
 import { useTooltip } from '@nivo/tooltip'
@@ -232,6 +226,8 @@ const InnerPieCanvas = <RawDatum,>({
     )
 
     const getArcFromMouse = (event: React.MouseEvent<HTMLCanvasElement>) => {
+        if (!canvasEl.current) return null
+
         const [x, y] = getRelativeCursor(canvasEl.current, event)
 
         const hoveredArc = findArcUnderCursor<Arc & { id: string | number }>(
@@ -297,9 +293,10 @@ const InnerPieCanvas = <RawDatum,>({
 export const PieCanvas = <RawDatum,>({
     isInteractive = defaultProps.isInteractive,
     theme,
+    renderWrapper,
     ...otherProps
 }: PieCanvasProps<RawDatum>) => (
-    <Container isInteractive={isInteractive} theme={theme}>
+    <Container {...{ isInteractive, renderWrapper, theme }}>
         <InnerPieCanvas<RawDatum> isInteractive={isInteractive} {...otherProps} />
     </Container>
 )

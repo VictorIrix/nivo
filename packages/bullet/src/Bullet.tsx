@@ -1,5 +1,3 @@
-import React from 'react'
-// @ts-ignore
 import { Container, SvgWrapper, useDimensions } from '@nivo/core'
 import { defaultProps } from './props'
 import { BulletSvgProps } from './types'
@@ -17,6 +15,9 @@ export const Bullet = (props: BulletSvgProps) => {
         reverse,
         axisPosition,
 
+        minValue,
+        maxValue,
+
         margin: partialMargin,
         width,
         height,
@@ -27,9 +28,13 @@ export const Bullet = (props: BulletSvgProps) => {
         titleOffsetY,
         titleRotation,
 
+        rangeBorderColor,
+        rangeBorderWidth,
         rangeComponent,
         rangeColors,
 
+        measureBorderColor,
+        measureBorderWidth,
         measureComponent,
         measureColors,
 
@@ -60,10 +65,12 @@ export const Bullet = (props: BulletSvgProps) => {
     const markerHeight = itemHeight * markerSize
 
     const enhancedData = useEnhancedData(data, {
+        height: innerHeight,
         layout,
+        maxValue: maxValue === 'auto' ? undefined : maxValue,
+        minValue: minValue === 'auto' ? undefined : minValue,
         reverse,
         width: innerWidth,
-        height: innerHeight,
     })
 
     return (
@@ -91,8 +98,12 @@ export const Bullet = (props: BulletSvgProps) => {
                         titleRotation={titleRotation}
                         measureHeight={measureHeight}
                         markerHeight={markerHeight}
+                        rangeBorderColor={rangeBorderColor}
+                        rangeBorderWidth={rangeBorderWidth}
                         rangeComponent={rangeComponent}
                         rangeColors={rangeColors}
+                        measureBorderColor={measureBorderColor}
+                        measureBorderWidth={measureBorderWidth}
                         measureComponent={measureComponent}
                         measureColors={measureColors}
                         markerComponent={markerComponent}

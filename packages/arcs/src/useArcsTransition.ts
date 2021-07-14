@@ -1,4 +1,4 @@
-import { useTransition } from 'react-spring'
+import { useTransition } from '@react-spring/web'
 import { useMotionConfig } from '@nivo/core'
 import { DatumWithArc } from './types'
 import { ArcTransitionMode, useArcTransitionMode, TransitionExtra } from './arcTransitionMode'
@@ -28,7 +28,7 @@ export const useArcsTransition = <Datum extends DatumWithArc, ExtraProps = unkno
             outerRadius: number
         } & ExtraProps
     >(data, {
-        key: datum => datum.id,
+        keys: datum => datum.id,
         initial: phases.update,
         from: phases.enter,
         enter: phases.update,

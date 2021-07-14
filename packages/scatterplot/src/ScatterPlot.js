@@ -6,7 +6,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-import React, { memo, Fragment, useMemo } from 'react'
+import { createElement, memo, Fragment, useMemo } from 'react'
 import {
     SvgWrapper,
     withContainer,
@@ -41,6 +41,7 @@ const ScatterPlot = props => {
         colors,
         blendMode,
 
+        nodeId,
         nodeSize,
         renderNode,
 
@@ -87,6 +88,7 @@ const ScatterPlot = props => {
         yFormat,
         width: innerWidth,
         height: innerHeight,
+        nodeId,
         nodeSize,
         colors,
     })
@@ -133,7 +135,7 @@ const ScatterPlot = props => {
                 left={axisLeft}
             />
         ),
-        nodes: React.createElement(Nodes, {
+        nodes: createElement(Nodes, {
             key: 'nodes',
             nodes,
             renderNode,
@@ -209,9 +211,7 @@ const ScatterPlot = props => {
                 }
 
                 if (typeof layer === 'function') {
-                    return (
-                        <Fragment key={i}>{React.createElement(layer, customLayerProps)}</Fragment>
-                    )
+                    return <Fragment key={i}>{createElement(layer, customLayerProps)}</Fragment>
                 }
 
                 throw new Error(`Unknown layer (${layer})`)

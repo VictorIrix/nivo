@@ -1,4 +1,3 @@
-import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { generateCountriesData } from '@nivo/generators'
 import { HeatMap } from '../src'
@@ -115,6 +114,17 @@ stories.add('with formatted values', () => (
         {...commonProperties}
         tooltipFormat={value =>
             `${Number(value).toLocaleString('ru-RU', {
+                minimumFractionDigits: 2,
+            })} ₽`
+        }
+    />
+))
+
+stories.add('with formatted labels', () => (
+    <HeatMap
+        {...commonProperties}
+        label={(datum, key) =>
+            `${Number(datum[key]).toLocaleString('ru-RU', {
                 minimumFractionDigits: 2,
             })} ₽`
         }

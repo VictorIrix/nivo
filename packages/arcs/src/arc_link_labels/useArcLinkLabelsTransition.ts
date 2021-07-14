@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { SpringValue, useTransition, to } from 'react-spring'
+import { SpringValue, useTransition, to } from '@react-spring/web'
 import { line } from 'd3-shape'
 import { useMotionConfig, useTheme } from '@nivo/core'
 import { InheritedColorConfig, useInheritedColor } from '@nivo/colors'
@@ -244,7 +244,7 @@ export const useArcLinkLabelsTransition = <Datum extends DatumWithArcAndColor>({
     })
 
     const transition = useTransition<Datum, AnimatedProps>(filteredData, {
-        key: datum => datum.id,
+        keys: datum => datum.id,
         initial: transitionPhases.update,
         from: transitionPhases.enter,
         enter: transitionPhases.update,

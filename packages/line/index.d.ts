@@ -11,17 +11,18 @@ import {
     Dimensions,
     Box,
     Theme,
-    MotionProps,
+    ModernMotionProps,
     CartesianMarkerProps,
     SvgDefsAndFill,
-    DataFormatter,
+    ValueFormat,
     DatumValue as CoreDatumValue,
 } from '@nivo/core'
 import { OrdinalColorScaleConfig } from '@nivo/colors'
 import { LegendProps } from '@nivo/legends'
-import { Scale, ScaleFunc } from '@nivo/scales'
-import { AxisProps, GridValues } from '@nivo/axes'
+import { ScaleSpec, Scale } from '@nivo/scales'
+import { AxisProps, TicksSpec } from '@nivo/axes'
 import { CrosshairType } from '@nivo/tooltip'
+import { Line as D3Line } from 'd3-shape'
 
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 
@@ -68,11 +69,11 @@ declare module '@nivo/line' {
     export interface CustomLayerProps extends Omit<LineSvgProps, 'xScale' | 'yScale'> {
         innerHeight: number
         innerWidth: number
-        lineGenerator: (data: Datum[]) => string
+        lineGenerator: D3Line<Array<ComputedDatum['position']>>
         points: Point[]
         series: ComputedSerie[]
-        xScale: ScaleFunc
-        yScale: ScaleFunc
+        xScale: Scale<unknown, unknown>
+        yScale: Scale<unknown, unknown>
     }
 
     export type CustomLayer = (props: CustomLayerProps) => React.ReactNode
@@ -131,10 +132,10 @@ declare module '@nivo/line' {
     export interface LineProps {
         data: Serie[]
 
-        xScale?: Scale
-        xFormat?: string | DataFormatter
-        yScale?: Scale
-        yFormat?: string | DataFormatter
+        xScale?: ScaleSpec
+        xFormat?: ValueFormat<DatumValue>
+        yScale?: ScaleSpec
+        yFormat?: ValueFormat<DatumValue>
 
         layers?: Layer[]
 
@@ -163,9 +164,9 @@ declare module '@nivo/line' {
         axisLeft?: AxisProps | null
 
         enableGridX?: boolean
-        gridXValues?: GridValues<DatumValue>
+        gridXValues?: TicksSpec<DatumValue>
         enableGridY?: boolean
-        gridYValues?: GridValues<DatumValue>
+        gridYValues?: TicksSpec<DatumValue>
 
         enablePoints?: boolean
         pointSymbol?: (props: Readonly<PointSymbolProps>) => React.ReactNode
@@ -192,7 +193,7 @@ declare module '@nivo/line' {
         debugSlices?: boolean
         sliceTooltip?: SliceTooltip
 
-        tooltipFormat?: DataFormatter | string
+        tooltipFormat?: ValueFormat<DatumValue>
         tooltip?: PointTooltip
 
         enableCrosshair?: boolean
@@ -201,7 +202,7 @@ declare module '@nivo/line' {
         legends?: LegendProps[]
     }
 
-    export interface LineSvgProps extends LineProps, MotionProps, SvgDefsAndFill<Datum> {
+    export interface LineSvgProps extends LineProps, ModernMotionProps, SvgDefsAndFill<Datum> {
         enablePointLabel?: boolean
         pointLabel?: string | AccessorFunc
         pointLabelYOffset?: number
@@ -213,8 +214,16 @@ declare module '@nivo/line' {
     export class Line extends React.Component<LineSvgProps & Dimensions> {}
     export class ResponsiveLine extends React.Component<LineSvgProps> {}
 
-    export interface LineCanvasProps extends LineProps {
+    export interface CustomCanvasLayerProps extends CustomLayerProps {
+        ctx: CanvasRenderingContext2D
+    }
+
+    export type CustomCanvasLayer = (props: CustomCanvasLayerProps) => void
+    export type CanvasLayer = LineLayerType | CustomCanvasLayer
+
+    export interface LineCanvasProps extends Omit<LineProps, 'layers'> {
         pixelRatio?: number
+        layers?: CanvasLayer[]
     }
 
     export class LineCanvas extends React.Component<LineCanvasProps & Dimensions> {}

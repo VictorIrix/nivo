@@ -6,11 +6,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-import React, { useRef, useEffect } from 'react'
-import { withContainer, useDimensions, useTheme } from '@nivo/core'
+import { useCallback, useRef, useEffect } from 'react'
+
+import * as React from 'react'
+import { getDistance, getRelativeCursor, withContainer, useDimensions, useTheme } from '@nivo/core'
 import { useInheritedColor } from '@nivo/colors'
+import { useTooltip } from '@nivo/tooltip'
 import { NetworkCanvasPropTypes, NetworkCanvasDefaultProps } from './props'
 import { useNetwork, useNodeColor, useLinkThickness } from './hooks'
+import NetworkNodeTooltip from './NetworkNodeTooltip'
 
 const NetworkCanvas = props => {
     const {
@@ -38,6 +42,8 @@ const NetworkCanvas = props => {
         linkColor,
 
         isInteractive,
+        tooltip,
+        onClick,
     } = props
 
     const canvasEl = useRef(null)
@@ -122,6 +128,55 @@ const NetworkCanvas = props => {
         getLinkColor,
     ])
 
+    const getNodeFromMouseEvent = useCallback(
+        (event: MouseEvent) => {
+            if (!canvasEl.current) return null
+
+            const [x, y] = getRelativeCursor(canvasEl.current, event)
+
+            return nodes.find(node => {
+                const distanceFromNode = getDistance(
+                    node.x,
+                    node.y,
+                    x - margin.left,
+                    y - margin.top
+                )
+                return distanceFromNode <= node.radius
+            })
+        },
+        [canvasEl, margin, nodes]
+    )
+
+    const { showTooltipFromEvent, hideTooltip } = useTooltip()
+
+    const handleMouseHover = useCallback(
+        (event: React.MouseEvent<HTMLCanvasElement>) => {
+            const node = getNodeFromMouseEvent(event)
+            if (node) {
+                showTooltipFromEvent(<NetworkNodeTooltip node={node} tooltip={tooltip} />, event)
+            } else {
+                hideTooltip()
+            }
+        },
+        [getNodeFromMouseEvent, showTooltipFromEvent, tooltip, hideTooltip]
+    )
+
+    const handleMouseLeave = useCallback(() => {
+        hideTooltip()
+    }, [hideTooltip])
+
+    const handleClick = useCallback(
+        (event: React.MouseEvent<HTMLCanvasElement>) => {
+            if (!onClick) return
+
+            const node = getNodeFromMouseEvent(event)
+            if (node) {
+                onClick(node, event)
+            }
+        },
+        [getNodeFromMouseEvent, onClick]
+    )
+
     return (
         <canvas
             ref={canvasEl}
@@ -132,6 +187,10 @@ const NetworkCanvas = props => {
                 height: outerHeight,
                 cursor: isInteractive ? 'auto' : 'normal',
             }}
+            onClick={isInteractive ? handleClick : undefined}
+            onMouseEnter={isInteractive ? handleMouseHover : undefined}
+            onMouseLeave={isInteractive ? handleMouseLeave : undefined}
+            onMouseMove={isInteractive ? handleMouseHover : undefined}
         />
     )
 }

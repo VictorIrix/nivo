@@ -1,11 +1,15 @@
-import { useMemo, useState } from 'react'
-import { get } from 'lodash'
+import { useCallback, useMemo, useState } from 'react'
 import { pie as d3Pie } from 'd3-shape'
-import { ArcGenerator, useArcGenerator, computeArcBoundingBox } from '@nivo/arcs'
-import { degreesToRadians, radiansToDegrees, useValueFormatter } from '@nivo/core'
+import { useArcGenerator, computeArcBoundingBox } from '@nivo/arcs'
+import {
+    degreesToRadians,
+    radiansToDegrees,
+    useValueFormatter,
+    usePropertyAccessor,
+} from '@nivo/core'
 import { OrdinalColorScaleConfig, useOrdinalColorScale } from '@nivo/colors'
 import { defaultProps } from './props'
-import { CompletePieSvgProps, ComputedDatum, PieArc, PieCustomLayerProps } from './types'
+import { CompletePieSvgProps, ComputedDatum, DatumId, PieArc, PieCustomLayerProps } from './types'
 
 interface MayHaveLabel {
     label?: string | number
@@ -26,11 +30,8 @@ export const useNormalizedData = <RawDatum extends MayHaveLabel>({
 }: Pick<CompletePieSvgProps<RawDatum>, 'id' | 'value' | 'valueFormat' | 'colors'> & {
     data: RawDatum[]
 }): Omit<ComputedDatum<RawDatum>, 'arc' | 'fill'>[] => {
-    const getId = useMemo(() => (typeof id === 'function' ? id : (d: RawDatum) => get(d, id)), [id])
-    const getValue = useMemo(
-        () => (typeof value === 'function' ? value : (d: RawDatum) => get(d, value)),
-        [value]
-    )
+    const getId = usePropertyAccessor<RawDatum, DatumId>(id)
+    const getValue = usePropertyAccessor<RawDatum, number>(value)
     const formatValue = useValueFormatter<number>(valueFormat)
 
     const getColor = useOrdinalColorScale<Omit<ComputedDatum<RawDatum>, 'arc' | 'color' | 'fill'>>(
@@ -47,6 +48,7 @@ export const useNormalizedData = <RawDatum extends MayHaveLabel>({
                 const normalizedDatum: Omit<ComputedDatum<RawDatum>, 'arc' | 'color' | 'fill'> = {
                     id: datumId,
                     label: datum.label ?? datumId,
+                    hidden: false,
                     value: datumValue,
                     formattedValue: formatValue(datumValue),
                     data: datum,
@@ -75,6 +77,7 @@ export const usePieArcs = <RawDatum>({
     activeId,
     activeInnerRadiusOffset,
     activeOuterRadiusOffset,
+    hiddenIds,
 }: {
     data: Omit<ComputedDatum<RawDatum>, 'arc' | 'fill'>[]
     // in degrees
@@ -87,10 +90,14 @@ export const usePieArcs = <RawDatum>({
     outerRadius: number
     padAngle: number
     sortByValue: boolean
-    activeId: null | string | number
+    activeId: null | DatumId
     activeInnerRadiusOffset: number
     activeOuterRadiusOffset: number
-}): Omit<ComputedDatum<RawDatum>, 'fill'>[] => {
+    hiddenIds: DatumId[]
+}): {
+    dataWithArc: Omit<ComputedDatum<RawDatum>, 'fill'>[]
+    legendData: Omit<ComputedDatum<RawDatum>, 'arc' | 'fill'>[]
+} => {
     const pie = useMemo(() => {
         const innerPie = d3Pie<Omit<ComputedDatum<RawDatum>, 'arc' | 'fill'>>()
             .value(d => d.value)
@@ -105,52 +112,54 @@ export const usePieArcs = <RawDatum>({
         return innerPie
     }, [startAngle, endAngle, padAngle, sortByValue])
 
-    return useMemo(
-        () =>
-            pie(data).map(
-                (
-                    arc: Omit<
-                        PieArc,
-                        'angle' | 'angleDeg' | 'innerRadius' | 'outerRadius' | 'thickness'
-                    > & {
-                        data: Omit<ComputedDatum<RawDatum>, 'arc' | 'fill'>
-                    }
-                ) => {
-                    const angle = Math.abs(arc.endAngle - arc.startAngle)
-
-                    return {
-                        ...arc.data,
-                        arc: {
-                            index: arc.index,
-                            startAngle: arc.startAngle,
-                            endAngle: arc.endAngle,
-                            innerRadius:
-                                activeId === arc.data.id
-                                    ? innerRadius - activeInnerRadiusOffset
-                                    : innerRadius,
-                            outerRadius:
-                                activeId === arc.data.id
-                                    ? outerRadius + activeOuterRadiusOffset
-                                    : outerRadius,
-                            thickness: outerRadius - innerRadius,
-                            padAngle: arc.padAngle,
-                            angle,
-                            angleDeg: radiansToDegrees(angle),
-                        },
-                    }
+    return useMemo(() => {
+        const hiddenData = data.filter(item => !hiddenIds.includes(item.id))
+        const dataWithArc = pie(hiddenData).map(
+            (
+                arc: Omit<
+                    PieArc,
+                    'angle' | 'angleDeg' | 'innerRadius' | 'outerRadius' | 'thickness'
+                > & {
+                    data: Omit<ComputedDatum<RawDatum>, 'arc' | 'fill'>
                 }
-            ),
+            ) => {
+                const angle = Math.abs(arc.endAngle - arc.startAngle)
 
-        [
-            pie,
-            data,
-            innerRadius,
-            outerRadius,
-            activeId,
-            activeInnerRadiusOffset,
-            activeInnerRadiusOffset,
-        ]
-    )
+                return {
+                    ...arc.data,
+                    arc: {
+                        index: arc.index,
+                        startAngle: arc.startAngle,
+                        endAngle: arc.endAngle,
+                        innerRadius:
+                            activeId === arc.data.id
+                                ? innerRadius - activeInnerRadiusOffset
+                                : innerRadius,
+                        outerRadius:
+                            activeId === arc.data.id
+                                ? outerRadius + activeOuterRadiusOffset
+                                : outerRadius,
+                        thickness: outerRadius - innerRadius,
+                        padAngle: arc.padAngle,
+                        angle,
+                        angleDeg: radiansToDegrees(angle),
+                    },
+                }
+            }
+        )
+        const legendData = data.map(item => ({ ...item, hidden: hiddenIds.includes(item.id) }))
+
+        return { dataWithArc, legendData }
+    }, [
+        pie,
+        data,
+        hiddenIds,
+        activeId,
+        innerRadius,
+        activeInnerRadiusOffset,
+        outerRadius,
+        activeOuterRadiusOffset,
+    ])
 }
 
 /**
@@ -169,7 +178,7 @@ export const usePie = <RawDatum>({
     activeInnerRadiusOffset = defaultProps.activeInnerRadiusOffset,
     activeOuterRadiusOffset = defaultProps.activeOuterRadiusOffset,
 }: Pick<
-    CompletePieSvgProps<RawDatum>,
+    Partial<CompletePieSvgProps<RawDatum>>,
     | 'startAngle'
     | 'endAngle'
     | 'padAngle'
@@ -182,8 +191,9 @@ export const usePie = <RawDatum>({
     radius: number
     innerRadius: number
 }) => {
-    const [activeId, setActiveId] = useState<string | number | null>(null)
-    const dataWithArc = usePieArcs({
+    const [activeId, setActiveId] = useState<DatumId | null>(null)
+    const [hiddenIds, setHiddenIds] = useState<DatumId[]>([])
+    const pieArcs = usePieArcs({
         data,
         startAngle,
         endAngle,
@@ -194,11 +204,18 @@ export const usePie = <RawDatum>({
         activeId,
         activeInnerRadiusOffset,
         activeOuterRadiusOffset,
+        hiddenIds,
     })
+
+    const toggleSerie = useCallback((id: DatumId) => {
+        setHiddenIds(state =>
+            state.indexOf(id) > -1 ? state.filter(item => item !== id) : [...state, id]
+        )
+    }, [])
 
     const arcGenerator = useArcGenerator({ cornerRadius, padAngle: degreesToRadians(padAngle) })
 
-    return { dataWithArc, arcGenerator, setActiveId }
+    return { ...pieArcs, arcGenerator, setActiveId, toggleSerie }
 }
 
 /**
@@ -239,6 +256,7 @@ export const usePieFromBox = <RawDatum>({
     data: Omit<ComputedDatum<RawDatum>, 'arc'>[]
 }) => {
     const [activeId, setActiveId] = useState<string | number | null>(null)
+    const [hiddenIds, setHiddenIds] = useState<DatumId[]>([])
     const computedProps = useMemo(() => {
         let radius = Math.min(width, height) / 2
         let innerRadius = radius * Math.min(innerRadiusRatio, 1)
@@ -287,7 +305,7 @@ export const usePieFromBox = <RawDatum>({
         }
     }, [width, height, innerRadiusRatio, startAngle, endAngle, fit, cornerRadius])
 
-    const dataWithArc = usePieArcs({
+    const pieArcs = usePieArcs({
         data,
         startAngle,
         endAngle,
@@ -298,7 +316,14 @@ export const usePieFromBox = <RawDatum>({
         activeId,
         activeInnerRadiusOffset,
         activeOuterRadiusOffset,
+        hiddenIds,
     })
+
+    const toggleSerie = useCallback((id: DatumId) => {
+        setHiddenIds(state =>
+            state.indexOf(id) > -1 ? state.filter(item => item !== id) : [...state, id]
+        )
+    }, [])
 
     const arcGenerator = useArcGenerator({
         cornerRadius,
@@ -306,9 +331,10 @@ export const usePieFromBox = <RawDatum>({
     })
 
     return {
-        dataWithArc,
         arcGenerator,
         setActiveId,
+        toggleSerie,
+        ...pieArcs,
         ...computedProps,
     }
 }
@@ -323,14 +349,7 @@ export const usePieLayerContext = <RawDatum>({
     centerY,
     radius,
     innerRadius,
-}: {
-    dataWithArc: ComputedDatum<RawDatum>[]
-    arcGenerator: ArcGenerator
-    centerX: number
-    centerY: number
-    radius: number
-    innerRadius: number
-}): PieCustomLayerProps<RawDatum> =>
+}: PieCustomLayerProps<RawDatum>): PieCustomLayerProps<RawDatum> =>
     useMemo(
         () => ({
             dataWithArc,

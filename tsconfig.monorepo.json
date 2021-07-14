@@ -5,20 +5,27 @@
         // { "path": "./packages/core" },
 
         // Shared next because charts need them
-        // { "path": "./packages/axes" },
+        { "path": "./packages/annotations" },
+        { "path": "./packages/scales" },
+        { "path": "./packages/axes" },
         { "path": "./packages/colors" },
-        // { "path": "./packages/legends" },
-        // { "path": "./packages/scales" },
+        { "path": "./packages/legends" },
         { "path": "./packages/tooltip" },
         { "path": "./packages/arcs" },
+        { "path": "./packages/voronoi" },
 
         // Utility package
-        // { "path": "./packages/generators" },
+        { "path": "./packages/generators" },
+        { "path": "./packages/recompose" },
 
         // Charts now
+        { "path": "./packages/bar" },
         { "path": "./packages/bullet" },
+        { "path": "./packages/calendar" },
+        { "path": "./packages/circle-packing" },
         { "path": "./packages/marimekko" },
         { "path": "./packages/pie" },
         { "path": "./packages/sunburst" },
+        { "path": "./packages/swarmplot" }
     ]
 }

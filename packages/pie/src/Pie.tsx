@@ -1,4 +1,4 @@
-import React, { ReactNode, Fragment, createElement } from 'react'
+import { ReactNode, Fragment, createElement } from 'react'
 import {
     // @ts-ignore
     bindDefs,
@@ -48,7 +48,7 @@ const InnerPie = <RawDatum,>({
     arcLabelsSkipAngle = defaultProps.arcLabelsSkipAngle,
     arcLabelsTextColor = defaultProps.arcLabelsTextColor,
     arcLabelsRadiusOffset = defaultProps.arcLabelsRadiusOffset,
-    arcLabelComponent,
+    arcLabelsComponent,
 
     // arc link labels
     enableArcLinkLabels = defaultProps.enableArcLinkLabels,
@@ -96,12 +96,14 @@ const InnerPie = <RawDatum,>({
 
     const {
         dataWithArc,
+        legendData,
         arcGenerator,
         centerX,
         centerY,
         radius,
         innerRadius,
         setActiveId,
+        toggleSerie,
     } = usePieFromBox<RawDatum>({
         data: normalizedData,
         width: innerWidth,
@@ -178,7 +180,7 @@ const InnerPie = <RawDatum,>({
                 skipAngle={arcLabelsSkipAngle}
                 textColor={arcLabelsTextColor}
                 transitionMode={transitionMode}
-                component={arcLabelComponent}
+                component={arcLabelsComponent}
             />
         )
     }
@@ -189,8 +191,9 @@ const InnerPie = <RawDatum,>({
                 key="legends"
                 width={innerWidth}
                 height={innerHeight}
-                dataWithArc={dataWithArc}
+                data={legendData}
                 legends={legends}
+                toggleSerie={toggleSerie}
             />
         )
     }
@@ -232,13 +235,17 @@ export const Pie = <RawDatum,>({
     animate = defaultProps.animate,
     motionConfig = defaultProps.motionConfig,
     theme,
+    renderWrapper,
     ...otherProps
 }: PieSvgProps<RawDatum>) => (
     <Container
-        isInteractive={isInteractive}
-        animate={animate}
-        motionConfig={motionConfig}
-        theme={theme}
+        {...{
+            animate,
+            isInteractive,
+            motionConfig,
+            renderWrapper,
+            theme,
+        }}
     >
         <InnerPie<RawDatum> isInteractive={isInteractive} {...otherProps} />
     </Container>

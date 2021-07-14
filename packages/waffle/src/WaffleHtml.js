@@ -6,9 +6,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-import React, { Component, Fragment } from 'react'
-import partial from 'lodash.partial'
-import setDisplayName from 'recompose/setDisplayName'
+import { createElement, Component, Fragment } from 'react'
+import partial from 'lodash/partial'
+import { setDisplayName } from '@nivo/recompose'
 import { TransitionMotion, spring } from 'react-motion'
 import { LegacyContainer } from '@nivo/core'
 import enhance from './enhance'
@@ -124,7 +124,7 @@ class WaffleHtml extends Component {
                                     return (
                                         <Fragment>
                                             {computedCells.map(cell =>
-                                                React.createElement(cellComponent, {
+                                                createElement(cellComponent, {
                                                     key: cell.position,
                                                     position: cell.position,
                                                     size: cellSize,
@@ -152,7 +152,7 @@ class WaffleHtml extends Component {
                         cellsRender = (
                             <Fragment>
                                 {computedCells.map(cell =>
-                                    React.createElement(cellComponent, {
+                                    createElement(cellComponent, {
                                         key: cell.position,
                                         position: cell.position,
                                         size: cellSize,

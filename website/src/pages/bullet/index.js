@@ -23,6 +23,8 @@ const generateData = () => [
 ]
 
 const initialProperties = {
+    minValue: defaultProps.minValue,
+    maxValue: defaultProps.maxValue,
     margin: {
         top: 50,
         right: 90,
@@ -37,6 +39,10 @@ const initialProperties = {
     titleOffsetX: -70,
     titleOffsetY: defaultProps.titleOffsetY,
     titleRotation: defaultProps.titleRotation,
+    rangeBorderColor: defaultProps.rangeBorderColor,
+    rangeBorderWidth: defaultProps.rangeBorderWidth,
+    measureBorderColor: defaultProps.measureBorderColor,
+    measureBorderWidth: defaultProps.measureBorderWidth,
     measureSize: 0.2,
     markerSize: 0.6,
     axisPosition: defaultProps.axisPosition,

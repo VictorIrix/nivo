@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useTransition, to, SpringValue } from 'react-spring'
+import { useTransition, to, SpringValue } from '@react-spring/web'
 import {
     // @ts-ignore
     midAngle,
@@ -59,7 +59,7 @@ export const useArcCentersTransition = <Datum extends DatumWithArc, ExtraProps =
             outerRadius: number
         } & ExtraProps
     >(data, {
-        key: datum => datum.id,
+        keys: datum => datum.id,
         initial: phases.update,
         from: phases.enter,
         enter: phases.update,

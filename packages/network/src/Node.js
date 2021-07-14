@@ -6,7 +6,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-import React, { memo } from 'react'
+import { memo } from 'react'
 import PropTypes from 'prop-types'
 
 const Node = ({
@@ -18,6 +18,7 @@ const Node = ({
     borderWidth,
     borderColor,
     scale = 1,
+    handleNodeClick,
     handleNodeHover,
     handleNodeLeave,
 }) => {
@@ -28,6 +29,7 @@ const Node = ({
             fill={color}
             strokeWidth={borderWidth}
             stroke={borderColor}
+            onClick={event => handleNodeClick(node, event)}
             onMouseEnter={event => handleNodeHover(node, event)}
             onMouseMove={event => handleNodeHover(node, event)}
             onMouseLeave={handleNodeLeave}

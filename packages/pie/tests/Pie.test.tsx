@@ -1,6 +1,4 @@
-import React from 'react'
 import { mount } from 'enzyme'
-import { animated } from 'react-spring'
 import { radiansToDegrees } from '@nivo/core'
 import { Pie } from '../src/index'
 
@@ -414,7 +412,7 @@ describe('Pie', () => {
                     width={400}
                     height={400}
                     data={sampleData}
-                    arcLabelComponent={CustomArcLabel}
+                    arcLabelsComponent={CustomArcLabel}
                     animate={false}
                 />
             )
@@ -545,6 +543,75 @@ describe('Pie', () => {
                     datum.color
                 )
             })
+        })
+
+        it('should use legend.data if provided', () => {
+            const wrapper = mount(
+                <Pie
+                    width={400}
+                    height={400}
+                    data={sampleData}
+                    colors={{ datum: 'data.color' }}
+                    legends={[
+                        {
+                            anchor: 'bottom',
+                            data: sampleData.map((data, index) => ({
+                                ...data,
+                                label: `${data.id}.${index}`,
+                            })),
+                            direction: 'row',
+                            itemWidth: 100,
+                            itemHeight: 20,
+                        },
+                    ]}
+                    animate={false}
+                />
+            )
+
+            const legendItems = wrapper.find('LegendSvgItem')
+            expect(legendItems).toHaveLength(sampleData.length)
+
+            sampleData.forEach((datum, index) => {
+                const legendItem = legendItems.at(index)
+                expect(legendItem.text()).toEqual(`${datum.id}.${index}`)
+                expect(legendItem.find('SymbolSquare').find('rect').prop('fill')).toEqual(
+                    datum.color
+                )
+            })
+        })
+
+        it('should toggle serie via legend', done => {
+            const wrapper = mount(
+                <Pie
+                    width={400}
+                    height={400}
+                    data={sampleData}
+                    legends={[
+                        {
+                            anchor: 'bottom',
+                            direction: 'row',
+                            toggleSerie: true,
+                            itemWidth: 100,
+                            itemHeight: 20,
+                        },
+                    ]}
+                    animate={false}
+                />
+            )
+
+            const legendItems = wrapper.find('LegendSvgItem')
+            const shapes = wrapper.find('ArcShape')
+
+            expect(shapes.at(0).prop('style').opacity).toMatchInlineSnapshot(`1`)
+
+            legendItems.at(0).find('rect').at(0).simulate('click')
+
+            // TODO: Figure out why pie isn't respecting animate property
+            setTimeout(() => {
+                expect(shapes.at(0).prop('style').opacity).toMatchInlineSnapshot(`0`)
+
+                done()
+            }, 1000)
         })
     })
 
@@ -700,7 +767,7 @@ describe('Pie', () => {
             )
             expect(wrapper.find('ArcShape')).toHaveLength(3)
 
-            wrapper.setProps({ layers: ['radialLabels', 'sliceLabels', 'legends'] })
+            wrapper.setProps({ layers: ['arcLinkLabels', 'arcLabels', 'legends'] })
             expect(wrapper.find('ArcShape')).toHaveLength(0)
         })
 
@@ -713,7 +780,7 @@ describe('Pie', () => {
                     height={400}
                     data={sampleData}
                     innerRadius={0.5}
-                    layers={['slices', 'radialLabels', 'sliceLabels', 'legends', CustomLayer]}
+                    layers={['arcs', 'arcLinkLabels', 'arcLabels', 'legends', CustomLayer]}
                     animate={false}
                 />
             )

@@ -6,7 +6,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-import React from 'react'
 import { bindDefs, SvgWrapper, useDimensions, withContainer } from '@nivo/core'
 import { Axes, Grid } from '@nivo/axes'
 import { BoxLegendSvg } from '@nivo/legends'
@@ -22,6 +21,8 @@ const Stream = ({
     offsetType,
     order,
     curve,
+
+    legendLabel,
 
     width,
     height,
@@ -91,6 +92,7 @@ const Stream = ({
         dotBorderColor,
         tooltipLabel,
         tooltipFormat,
+        legendLabel,
     })
 
     const boundDefs = bindDefs(defs, layers, fill)
@@ -154,7 +156,7 @@ const Stream = ({
                 const legendData = layers
                     .map(l => ({
                         id: l.id,
-                        label: l.id,
+                        label: l.label,
                         color: l.color,
                         fill: l.fill,
                     }))

@@ -6,7 +6,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-import React, { Fragment, useCallback } from 'react'
+import { createElement, Fragment, useCallback } from 'react'
 import { withContainer, useDimensions, SvgWrapper, useTheme, useMotionConfig } from '@nivo/core'
 import { useInheritedColor } from '@nivo/colors'
 import { useTooltip } from '@nivo/tooltip'
@@ -41,8 +41,11 @@ const Network = props => {
 
         linkThickness,
         linkColor,
+
         tooltip,
         isInteractive,
+        onClick,
+
         role,
     } = props
 
@@ -84,18 +87,19 @@ const Network = props => {
     }, [hideTooltip])
 
     const layerById = {
-        links: React.createElement(animate === true ? AnimatedLinks : StaticLinks, {
+        links: createElement(animate === true ? AnimatedLinks : StaticLinks, {
             key: 'links',
             links,
             linkThickness: getLinkThickness,
             linkColor: getLinkColor,
         }),
-        nodes: React.createElement(animate === true ? AnimatedNodes : StaticNodes, {
+        nodes: createElement(animate === true ? AnimatedNodes : StaticNodes, {
             key: 'nodes',
             nodes,
             color: getColor,
             borderWidth: nodeBorderWidth,
             borderColor: getBorderColor,
+            handleNodeClick: isInteractive ? onClick : undefined,
             handleNodeHover: isInteractive ? handleNodeHover : undefined,
             handleNodeLeave: isInteractive ? handleNodeLeave : undefined,
         }),

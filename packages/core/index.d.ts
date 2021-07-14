@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { OpaqueInterpolation, SpringConfig } from 'react-spring'
+import { Interpolation, SpringConfig } from '@react-spring/web'
 
 declare module '@nivo/core' {
     export type DatumValue = string | number | Date
@@ -8,6 +8,13 @@ declare module '@nivo/core' {
         height: number
         width: number
     }
+
+    export interface Point {
+        x: number
+        y: number
+    }
+
+    export interface AlignBox extends Dimensions, Point {}
 
     export type Margin = {
         bottom: number
@@ -28,7 +35,11 @@ declare module '@nivo/core' {
         | 'bottom-left'
         | 'left'
     export const boxAlignments: BoxAlign[]
-    export function alignBox(box: Box, container: Box, alignment: BoxAlign): [number, number]
+    export function alignBox(
+        box: AlignBox,
+        container: AlignBox,
+        alignment: BoxAlign
+    ): [number, number]
 
     export type GetColor<T> = (datum: T) => string
     export type Colors = string[] | string
@@ -66,6 +77,13 @@ declare module '@nivo/core' {
             line: Partial<React.CSSProperties>
         }
         legends: {
+            hidden: {
+                symbol: Partial<{
+                    fill: string
+                    opacity: number
+                }>
+                text: Partial<React.CSSProperties>
+            }
             text: Partial<React.CSSProperties>
         }
         labels: {
@@ -90,10 +108,28 @@ declare module '@nivo/core' {
             tableCellValue: Partial<React.CSSProperties>
         }
         annotations: {
-            text: Partial<React.CSSProperties>
-            link: Partial<React.CSSProperties>
-            outline: Partial<React.CSSProperties>
-            symbol: Partial<React.CSSProperties>
+            text: {
+                fill: string
+                outlineWidth: number
+                outlineColor: string
+            } & Partial<Omit<React.CSSProperties, 'fill'>>
+            link: {
+                stroke: string
+                strokeWidth: number
+                outlineWidth: number
+                outlineColor: string
+            } & Partial<Omit<React.CSSProperties, 'stroke' | 'strokeWidth'>>
+            outline: {
+                stroke: string
+                strokeWidth: number
+                outlineWidth: number
+                outlineColor: string
+            } & Partial<Omit<React.CSSProperties, 'stroke' | 'strokeWidth'>>
+            symbol: {
+                fill: string
+                outlineWidth: number
+                outlineColor: string
+            } & Partial<Omit<React.CSSProperties, 'fill'>>
         }
     }
 
@@ -118,6 +154,10 @@ declare module '@nivo/core' {
                 line: Partial<CompleteTheme['grid']['line']>
             }>
             legends: Partial<{
+                hidden: Partial<{
+                    symbol: CompleteTheme['legends']['hidden']['symbol']
+                    text: CompleteTheme['legends']['hidden']['text']
+                }>
                 text: Partial<CompleteTheme['legends']['text']>
             }>
             labels: Partial<{
@@ -128,7 +168,12 @@ declare module '@nivo/core' {
                 text: Partial<CompleteTheme['dots']['text']>
             }>
             tooltip: Partial<CompleteTheme['tooltip']>
-            annotations: Partial<CompleteTheme['annotations']>
+            annotations: Partial<{
+                text: Partial<CompleteTheme['annotations']['text']>
+                link: Partial<CompleteTheme['annotations']['link']>
+                outline: Partial<CompleteTheme['annotations']['outline']>
+                symbol: Partial<CompleteTheme['annotations']['symbol']>
+            }>
         }
     >
 
@@ -208,7 +253,7 @@ declare module '@nivo/core' {
         | 'stepAfter'
         | 'stepBefore'
 
-    export function useAnimatedPath(path: string): OpaqueInterpolation<string>
+    export function useAnimatedPath(path: string): Interpolation<string>
 
     export type LinearGradientDef = {
         id: string
@@ -250,23 +295,25 @@ declare module '@nivo/core' {
         defs: Def[]
     }
 
-    export declare const defaultAnimate = true
-    export declare const defaultMotionStiffness = 90
-    export declare const defaultMotionDamping = 15
+    export const defaultAnimate = true
+    export const defaultMotionStiffness = 90
+    export const defaultMotionDamping = 15
 
-    export declare const motionDefaultProps = {
-        animate: true,
-        stiffness: 90,
-        damping: 15,
-        config: 'default',
+    type MotionDefaultProps = {
+        animate: true
+        stiffness: 90
+        damping: 15
+        config: 'default'
     }
+    export const motionDefaultProps: MotionDefaultProps
 
-    export declare const defaultMargin = {
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 0,
+    type DefaultMargin = {
+        top: 0
+        right: 0
+        bottom: 0
+        left: 0
     }
+    export const defaultMargin: DefaultMargin
 
     export function PatternLines(props: Omit<PatternLinesDef, 'type'>): JSX.Element
     export function PatternSquares(props: Omit<PatternSquaresDef, 'type'>): JSX.Element
@@ -276,8 +323,9 @@ declare module '@nivo/core' {
 
     export function degreesToRadians(degrees: number): number
     export function radiansToDegrees(radians: number): number
+    export function absoluteAngleDegrees(degrees: number): number
 
-    type Accessor<T, U> = T extends string ? U[T] : never
+    type Accessor<T extends keyof U, U> = T extends string ? U[T] : never
 
     export type DatumPropertyAccessor<RawDatum, T> = (datum: RawDatum) => T
 
@@ -293,7 +341,7 @@ declare module '@nivo/core' {
         outerHeight: number
     }
 
-    export const SvgWrapper = (
+    type SvgWrapperType = (
         props: React.PropsWithChildren<{
             width: number
             height: number
@@ -302,6 +350,7 @@ declare module '@nivo/core' {
             role?: string
         }>
     ) => JSX.Element
+    export const SvgWrapper: SvgWrapperType
 
     interface ContainerProps {
         theme?: Theme
@@ -313,17 +362,23 @@ declare module '@nivo/core' {
         motionConfig?: string | SpringConfig
     }
 
-    export const Container = (props: React.PropsWithChildren<ContainerProps>) => JSX.Element
+    type ContainerType = (props: React.PropsWithChildren<ContainerProps>) => JSX.Element
+    export const Container: ContainerType
 
-    export const ResponsiveWrapper = (props: {
+    type ResponsiveWrapperType = (props: {
         children: (dimensions: { width: number; height: number }) => JSX.Element
     }) => JSX.Element
+    export const ResponsiveWrapper: ResponsiveWrapperType
+
+    interface ThemeProviderProps {
+        theme?: Theme
+    }
+
+    type ThemeProviderType = (props: React.PropsWithChildren<ThemeProviderProps>) => JSX.Element
+    export const ThemeProvider: ThemeProviderType
 
     export function getDistance(x1: number, y1: number, x2: number, y2: number): number
     export function getAngle(x1: number, y1: number, x2: number, y2: number): number
-
-    export function radiansToDegrees(radians: number): number
-    export function degreesToRadians(degrees: number): number
 
     export function positionFromAngle(
         angle: number,
@@ -352,4 +407,14 @@ declare module '@nivo/core' {
     export function usePropertyAccessor<Datum, Value>(
         accessor: PropertyAccessor<Datum, Value>
     ): (datum: Datum) => Value
+
+    export function getRelativeCursor(element: Element, event: React.MouseEvent): [number, number]
+    export function isCursorInRect(
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        cursorX: number,
+        cursorY: number
+    ): boolean
 }

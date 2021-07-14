@@ -14,11 +14,12 @@ import {
     MotionProps,
     CartesianMarkerProps,
     CssMixBlendMode,
+    PropertyAccessor,
 } from '@nivo/core'
 import { OrdinalColorScaleConfig } from '@nivo/colors'
 import { LegendProps } from '@nivo/legends'
 import { AxisProps, GridValues } from '@nivo/axes'
-import { Scale } from '@nivo/scales'
+import { ScaleSpec } from '@nivo/scales'
 
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 
@@ -29,6 +30,11 @@ declare module '@nivo/scatterplot' {
     export interface Datum {
         x: Value
         y: Value
+    }
+
+    export interface NodeIdDatum extends Record<string, string | number> {
+        serieId: Serie['id']
+        index: number
     }
 
     export type DerivedDatumProp<T> = (node: Datum) => T
@@ -91,8 +97,8 @@ declare module '@nivo/scatterplot' {
     export type CustomTooltip = (props: TooltipProps) => React.ReactNode
 
     export interface ScatterPlotComputedProps {
-        xScale: Scale
-        yScale: Scale
+        xScale: ScaleSpec
+        yScale: ScaleSpec
         nodes: Node[]
         innerWidth: number
         innerHeight: number
@@ -118,9 +124,9 @@ declare module '@nivo/scatterplot' {
     export interface ScatterPlotProps {
         data: Serie[]
 
-        xScale?: Scale
+        xScale?: ScaleSpec
         xFormat?: string | ValueFormatter
-        yScale?: Scale
+        yScale?: ScaleSpec
         yFormat?: string | ValueFormatter
 
         margin?: Box
@@ -138,6 +144,7 @@ declare module '@nivo/scatterplot' {
         axisBottom?: AxisProps | null
         axisLeft?: AxisProps | null
 
+        nodeId?: PropertyAccessor<NodeIdDatum, string>
         nodeSize?: number | DerivedDatumProp<number> | DynamicSizeSpec | DerivedNodeProp<number>
 
         isInteractive?: boolean

@@ -6,9 +6,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-import React, { memo } from 'react'
+import { createElement, memo } from 'react'
 import PropTypes from 'prop-types'
-import { useTransition } from 'react-spring'
+import { useTransition } from '@react-spring/web'
 import { useMotionConfig } from '@nivo/core'
 import { useInteractiveTreeMapNodes } from './hooks'
 
@@ -90,7 +90,7 @@ const TreeMapNodes = ({
     })
 
     return transition((animatedProps, node) => {
-        return React.createElement(nodeComponent, {
+        return createElement(nodeComponent, {
             key: node.path,
             node,
             animatedProps,

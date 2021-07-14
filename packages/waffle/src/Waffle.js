@@ -6,10 +6,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-import React, { Component, Fragment } from 'react'
-import partial from 'lodash.partial'
+import { createElement, Component, Fragment } from 'react'
+import partial from 'lodash/partial'
 import { TransitionMotion, spring } from 'react-motion'
-import setDisplayName from 'recompose/setDisplayName'
+import { setDisplayName } from '@nivo/recompose'
 import { LegacyContainer, SvgWrapper } from '@nivo/core'
 import { BoxLegendSvg } from '@nivo/legends'
 import { WafflePropTypes } from './props'
@@ -135,7 +135,7 @@ export class Waffle extends Component {
                                     return (
                                         <Fragment>
                                             {computedCells.map(cell =>
-                                                React.createElement(cellComponent, {
+                                                createElement(cellComponent, {
                                                     key: cell.position,
                                                     position: cell.position,
                                                     size: cellSize,
@@ -163,7 +163,7 @@ export class Waffle extends Component {
                         cellsRender = (
                             <Fragment>
                                 {computedCells.map(cell =>
-                                    React.createElement(cellComponent, {
+                                    createElement(cellComponent, {
                                         key: cell.position,
                                         position: cell.position,
                                         size: cellSize,

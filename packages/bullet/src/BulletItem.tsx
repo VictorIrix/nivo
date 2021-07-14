@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react'
-import { useSpring, animated } from 'react-spring'
+import { useMemo } from 'react'
+import { useSpring, animated } from '@react-spring/web'
 import { Axis } from '@nivo/axes'
 // @ts-ignore
 import { getColorScale, useMotionConfig, useTheme } from '@nivo/core'
@@ -28,10 +28,14 @@ export const BulletItem = ({
     titleOffsetY,
     titleRotation,
 
+    rangeBorderColor,
+    rangeBorderWidth,
     rangeComponent,
     rangeColors,
     ranges,
 
+    measureBorderColor,
+    measureBorderWidth,
     measureComponent,
     measureHeight,
     measureColors,
@@ -52,13 +56,13 @@ export const BulletItem = ({
     const computedRanges = useMemo(() => {
         const rangeColorScale = getColorScale(rangeColors, scale, true)
 
-        return stackValues(ranges, rangeColorScale)
+        return stackValues(ranges, scale, rangeColorScale, 'range')
     }, [rangeColors, ranges, scale])
 
     const computedMeasures = useMemo(() => {
         const measureColorScale = getColorScale(measureColors, scale)
 
-        return stackValues(measures, measureColorScale)
+        return stackValues(measures, scale, measureColorScale, 'measures')
     }, [measureColors, measures, scale])
 
     const computedMarkers = useMemo(() => {
@@ -84,6 +88,8 @@ export const BulletItem = ({
             width={width}
             height={height}
             component={rangeComponent}
+            borderColor={rangeBorderColor}
+            borderWidth={rangeBorderWidth}
             onMouseEnter={(range, event) => {
                 showTooltipFromEvent(
                     <BasicTooltip
@@ -137,7 +143,6 @@ export const BulletItem = ({
     const axis = (
         <g transform={`translate(${axisX},${axisY})`}>
             <Axis
-                // @ts-ignore
                 axis={layout === 'horizontal' ? 'x' : 'y'}
                 length={layout === 'horizontal' ? width : height}
                 scale={scale}
@@ -199,6 +204,8 @@ export const BulletItem = ({
                 width={width}
                 height={measureHeight}
                 component={measureComponent}
+                borderColor={measureBorderColor}
+                borderWidth={measureBorderWidth}
                 onMouseEnter={(measure, event) => {
                     showTooltipFromEvent(
                         <BasicTooltip

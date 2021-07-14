@@ -1,4 +1,4 @@
-import React from 'react'
+import { action } from '@storybook/addon-actions'
 import { storiesOf } from '@storybook/react'
 import { NetworkDefaultProps } from '../src/props'
 import { generateNetworkData } from '@nivo/generators'
@@ -40,4 +40,8 @@ stories.add('custom tooltip', () => (
             )
         }}
     />
+))
+
+stories.add('supports onClick for the node', () => (
+    <Network {...commonProperties} onClick={action('onClick')} />
 ))

@@ -1,4 +1,3 @@
-import React from 'react'
 import { storiesOf } from '@storybook/react'
 import range from 'lodash/range'
 import shuffle from 'lodash/shuffle'
@@ -130,6 +129,19 @@ stories.add('Missing data', () => (
                 ],
             },
         ]}
+    />
+))
+
+stories.add('More series than ranks', () => (
+    <Bump
+        {...commonProps}
+        data={generateData().map(series => ({
+            ...series,
+            data: series.data.map(datum => ({
+                x: datum.x,
+                y: datum.y >= 5 ? null : datum.y,
+            })),
+        }))}
     />
 ))
 

@@ -1,7 +1,7 @@
 import sortBy from 'lodash/sortBy'
 import areaBump from './components/area-bump/meta.yml'
 import bar from './components/bar/meta.yml'
-import bubble from './components/bubble/meta.yml'
+import circlePacking from './components/circle-packing/meta.yml'
 import bump from './components/bump/meta.yml'
 import bullet from './components/bullet/meta.yml'
 import calendar from './components/calendar/meta.yml'
@@ -21,6 +21,7 @@ import scatterplot from './components/scatterplot/meta.yml'
 import stream from './components/stream/meta.yml'
 import sunburst from './components/sunburst/meta.yml'
 import swarmplot from './components/swarmplot/meta.yml'
+import timeRange from './components/time-range/meta.yml'
 import treemap from './components/treemap/meta.yml'
 import voronoi from './components/voronoi/meta.yml'
 import waffle from './components/waffle/meta.yml'
@@ -39,10 +40,10 @@ export const components = [
         tags: bar.Bar.tags,
     },
     {
-        label: 'Bubble',
-        path: '/bubble/',
+        label: 'CirclePacking',
+        path: '/circle-packing/',
         icon: 'circle-packing',
-        tags: bubble.Bubble.tags,
+        tags: circlePacking.CirclePacking.tags,
     },
     {
         label: 'Bump',
@@ -159,6 +160,12 @@ export const components = [
         tags: swarmplot.SwarmPlot.tags,
     },
     {
+        label: 'TimeRange',
+        path: '/time-range/',
+        icon: 'time-range',
+        tags: timeRange.TimeRange.tags,
+    },
+    {
         label: 'TreeMap',
         path: '/treemap/',
         icon: 'treemap',
@@ -192,23 +199,24 @@ const all = components.concat([
         tags: [...bar.Bar.tags, 'HTTP API'],
     },
     {
-        label: 'BubbleHtml',
-        path: '/bubble/html/',
+        label: 'CirclePackingHtml',
+        path: '/circle-packing/html/',
         icon: 'circle-packing',
-        tags: bubble.BubbleHtml.tags,
+        tags: circlePacking.CirclePackingHtml.tags,
     },
     {
-        label: 'BubbleCanvas',
-        path: '/bubble/canvas/',
+        label: 'CirclePackingCanvas',
+        path: '/circle-packing/canvas/',
         icon: 'circle-packing',
-        tags: bubble.BubbleCanvas.tags,
+        tags: circlePacking.CirclePackingCanvas.tags,
     },
-    {
-        label: 'Bubble HTTP API',
-        path: '/bubble/api/',
-        icon: 'circle-packing',
-        tags: [...bubble.Bubble.tags, 'HTTP API'],
-    },
+    // Disabled until the API is fixed
+    // {
+    //     label: 'CirclePacking HTTP API',
+    //     path: '/circle-packing/api/',
+    //     icon: 'circle-packing',
+    //     tags: [...circlePacking.CirclePacking.tags, 'HTTP API'],
+    // },
     {
         label: 'CalendarCanvas',
         path: '/calendar/canvas/',

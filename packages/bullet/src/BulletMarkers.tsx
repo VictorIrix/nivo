@@ -1,5 +1,6 @@
-import React, { useMemo } from 'react'
-import { useTransition } from 'react-spring'
+import { useMemo } from 'react'
+import * as React from 'react'
+import { useTransition } from '@react-spring/web'
 // @ts-ignore
 import { useMotionConfig } from '@nivo/core'
 import {
@@ -63,7 +64,7 @@ export const BulletMarkers = ({
     const transition = useTransition<MarkerWithPosition, PositionWithColor>(
         markers.map(marker => ({ ...marker, position: getPosition(marker) })),
         {
-            key: marker => `${marker.index}`,
+            keys: marker => `${marker.index}`,
             enter: ({ color, position }: MarkerWithPosition) => ({
                 color,
                 transform: `rotate(${position.rotation}, ${position.x}, ${position.y})`,

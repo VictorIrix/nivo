@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { Box, Dimensions, Theme, Colors, ModernMotionProps } from '@nivo/core'
-import { ScaleLinear } from 'd3-scale'
-import { SpringValues } from 'react-spring'
+import { InheritedColorConfig } from '@nivo/colors'
+import { ScaleLinear } from '@nivo/scales'
+import { SpringValues } from '@react-spring/web'
 
 export type DatumId = string | number
 export type DatumValue = number
@@ -22,7 +23,7 @@ export interface Datum {
 }
 
 export type EnhancedDatum = Datum & {
-    scale: ScaleLinear<number, number, never>
+    scale: ScaleLinear<number>
 }
 
 export interface ComputedRangeDatum {
@@ -47,15 +48,22 @@ export type CommonBulletProps = Dimensions & {
     reverse: boolean
     spacing: number
 
+    minValue: 'auto' | number
+    maxValue: 'auto' | number
+
     titlePosition: 'before' | 'after'
     titleAlign: 'start' | 'middle' | 'end'
     titleOffsetX: number
     titleOffsetY: number
     titleRotation: number
 
+    rangeBorderColor: InheritedColorConfig<ComputedRangeDatum>
+    rangeBorderWidth: number
     rangeComponent: React.ComponentType<BulletRectsItemProps>
     rangeColors: Colors
 
+    measureBorderColor: InheritedColorConfig<ComputedRangeDatum>
+    measureBorderWidth: number
     measureComponent: React.ComponentType<BulletRectsItemProps>
     measureColors: Colors
     measureSize: number
@@ -103,9 +111,11 @@ export type BulletRectsItemProps = Pick<
     Point &
     Dimensions & {
         animatedProps: SpringValues<BulletRectAnimatedProps>
-        index: number
+        borderColor: string
+        borderWidth: number
         color: string
         data: ComputedRangeDatum
+        index: number
         onMouseMove: BulletRectsProps['onMouseEnter']
     }
 
@@ -133,7 +143,9 @@ export type BulletRectsProps = Pick<CommonBulletProps, 'layout' | 'reverse'> &
             measuresY: number
             transform: string
         }>
-        scale: ScaleLinear<number, number, never>
+        borderColor: InheritedColorConfig<ComputedRangeDatum>
+        borderWidth: number
+        scale: ScaleLinear<number>
         data: ComputedRangeDatum[]
         component: CommonBulletProps['rangeComponent']
         onMouseEnter: MouseEventWithDatum<ComputedRangeDatum, SVGRectElement>
@@ -160,7 +172,7 @@ export type PositionWithColor = {
 
 export type BulletMarkersProps = Pick<CommonBulletProps, 'layout' | 'reverse'> &
     Pick<Dimensions, 'height'> & {
-        scale: ScaleLinear<number, number, never>
+        scale: ScaleLinear<number>
         markerSize: number
         markers: ComputedMarkersDatum[]
         component: CommonBulletProps['markerComponent']
@@ -176,6 +188,8 @@ export type BulletItemProps = Omit<
     | 'margin'
     | 'spacing'
     | 'role'
+    | 'minValue'
+    | 'maxValue'
     | 'measureSize'
     | 'markerSize'
     | 'theme'

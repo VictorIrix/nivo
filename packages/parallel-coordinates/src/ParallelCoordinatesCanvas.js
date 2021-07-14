@@ -6,7 +6,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-import React, { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { useDimensions, useTheme, withContainer } from '@nivo/core'
 import { renderAxisToCanvas } from '@nivo/axes'
@@ -130,8 +130,7 @@ ParallelCoordinatesCanvas.propTypes = {
 const WrappedParallelCoordinatesCanvas = withContainer(ParallelCoordinatesCanvas)
 WrappedParallelCoordinatesCanvas.defaultProps = {
     ...commonDefaultProps,
-    pixelRatio:
-        global.window && global.window.devicePixelRatio ? global.window.devicePixelRatio : 1,
+    pixelRatio: typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1,
 }
 
 export default WrappedParallelCoordinatesCanvas

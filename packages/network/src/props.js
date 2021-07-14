@@ -42,6 +42,7 @@ const commonPropTypes = {
     linkColor: inheritedColorPropType.isRequired,
 
     isInteractive: PropTypes.bool.isRequired,
+    onClick: PropTypes.func,
 }
 
 export const NetworkPropTypes = {
@@ -83,6 +84,5 @@ export const NetworkDefaultProps = {
 
 export const NetworkCanvasDefaultProps = {
     ...commonDefaultProps,
-    pixelRatio:
-        global.window && global.window.devicePixelRatio ? global.window.devicePixelRatio : 1,
+    pixelRatio: typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1,
 }

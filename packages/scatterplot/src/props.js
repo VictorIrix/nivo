@@ -11,8 +11,6 @@ import { motionPropTypes, blendModePropType } from '@nivo/core'
 import { ordinalColorsPropType } from '@nivo/colors'
 import { axisPropType } from '@nivo/axes'
 import { LegendPropShape } from '@nivo/legends'
-import { scalePropType } from '@nivo/scales'
-import { annotationSpecPropType } from '@nivo/annotations'
 import Node from './Node'
 import Tooltip from './Tooltip'
 
@@ -36,9 +34,9 @@ const commonPropTypes = {
             ).isRequired,
         })
     ).isRequired,
-    xScale: scalePropType.isRequired,
+    xScale: PropTypes.object.isRequired,
     xFormat: PropTypes.any,
-    yScale: scalePropType.isRequired,
+    yScale: PropTypes.object.isRequired,
     yFormat: PropTypes.any,
 
     layers: PropTypes.arrayOf(
@@ -55,7 +53,7 @@ const commonPropTypes = {
     axisBottom: axisPropType,
     axisLeft: axisPropType,
 
-    annotations: PropTypes.arrayOf(annotationSpecPropType).isRequired,
+    annotations: PropTypes.arrayOf(PropTypes.object).isRequired,
 
     nodeSize: PropTypes.oneOfType([
         PropTypes.number,
@@ -120,6 +118,7 @@ const commonDefaultProps = {
     axisBottom: {},
     axisLeft: {},
 
+    nodeId: ({ serieId, index }) => `${serieId}.${index}`,
     nodeSize: 9,
     renderNode: Node,
 
@@ -151,8 +150,7 @@ export const ScatterPlotDefaultProps = {
 export const ScatterPlotCanvasDefaultProps = {
     ...commonDefaultProps,
     layers: ['grid', 'axes', 'nodes', 'mesh', 'legends', 'annotations'],
-    pixelRatio:
-        global.window && global.window.devicePixelRatio ? global.window.devicePixelRatio : 1,
+    pixelRatio: typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1,
 }
 
 export const NodePropType = PropTypes.shape({

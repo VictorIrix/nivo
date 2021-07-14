@@ -16,10 +16,11 @@ import {
     StackOffset,
     AreaCurve,
     SvgDefsAndFill,
+    PropertyAccessor,
 } from '@nivo/core'
 import { OrdinalColorScaleConfig, InheritedColorConfig } from '@nivo/colors'
 import { LegendProps } from '@nivo/legends'
-import { Scale } from '@nivo/scales'
+import { ScaleSpec } from '@nivo/scales'
 import { AxisProps } from '@nivo/axes'
 
 declare module '@nivo/stream' {
@@ -44,16 +45,42 @@ declare module '@nivo/stream' {
         y2: number
     }
 
+    interface DotDatum extends StreamLayerDatum {
+        id: string
+        color: string
+    }
+
+    export interface DatumId {
+        id: string
+    }
+
+    export interface StreamLayerDatum {
+        index: number
+        x: number
+        value: number
+        y1: number
+        y2: number
+    }
+
+    export interface ComputedDatum {
+        id: number
+        layer: StreamLayerDatum[]
+        path: string
+        color: string
+    }
+
     export type DatumToNumber = (datum: Datum) => number
 
     interface OptionalStreamProps<T> extends SvgDefsAndFill<T>, MotionProps {
         stack: StackFunc<T>
-        xScale: Scale
-        yScale: Scale
+        xScale: ScaleSpec
+        yScale: ScaleSpec
 
         order: StackOrder
         offsetType: StackOffset
         curve: AreaCurve
+
+        legendLabel: PropertyAccessor<DatumId, string>
 
         margin: Box
 
@@ -68,15 +95,15 @@ declare module '@nivo/stream' {
         fillOpacity: number
 
         borderWidth: number
-        borderColor: InheritedColorConfig
+        borderColor: InheritedColorConfig<ComputedDatum>
 
         enableDots: boolean
         renderDot: StreamDotsItem
         dotPosition: 'start' | 'center' | 'end'
         dotSize: DatumToNumber | number
-        dotColor: InheritedColorConfig
+        dotColor: InheritedColorConfig<DotDatum>
         dotBorderWidth: DatumToNumber | number
-        dotBorderColor: InheritedColorConfig
+        dotBorderColor: InheritedColorConfig<DotDatum>
 
         isInteractive: boolean
         tooltipLabel: TooltipLabel<T>

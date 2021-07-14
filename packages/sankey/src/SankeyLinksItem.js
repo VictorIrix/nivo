@@ -6,9 +6,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-import React, { memo, useCallback, useMemo } from 'react'
+import { memo, useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
-import { useSpring, animated } from 'react-spring'
+import { useSpring, animated } from '@react-spring/web'
 import { blendModePropType, useAnimatedPath, useMotionConfig } from '@nivo/core'
 import { BasicTooltip, Chip, useTooltip } from '@nivo/tooltip'
 import SankeyLinkGradient from './SankeyLinkGradient'
